@@ -204,17 +204,16 @@ ICON_GLOBE = (
 # DARK THEME CSS STYLING & ICON CDN
 # ==========================================
 st.markdown(
-    textwrap.dedent(
-        """
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    """<style>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
     }
 
     /* Hero Section */
+
     .hero-container {
         background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
         border: 1px solid rgba(56, 189, 248, 0.2);
@@ -244,6 +243,7 @@ st.markdown(
         line-height: 1.6;
         margin-bottom: 18px;
     }
+    
 
     /* Badges */
     .badge-container {
@@ -597,9 +597,7 @@ st.markdown(
         color: #FFFFFF !important;
         box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
     }
-    </style>
-    """
-    ).strip(),
+</style>""",
     unsafe_allow_html=True,
 )
 
@@ -788,7 +786,7 @@ with nav_col2:
 with nav_col3:
     st.link_button(
         "💻 View Source Code",
-        url=APP_CONFIG.repo_url,
+        url=getattr(APP_CONFIG, "repo_url", "https://github.com/TuhassinulArnob/HandWriting_Detection_simpleANN"),
         use_container_width=True,
     )
 
