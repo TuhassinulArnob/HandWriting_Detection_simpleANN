@@ -18,6 +18,7 @@ Production Architecture:
 """
 
 import json
+import textwrap
 from enum import Enum
 from pathlib import Path
 from typing import Optional, Dict, Any, Tuple
@@ -203,10 +204,11 @@ ICON_GLOBE = (
 # DARK THEME CSS STYLING & ICON CDN
 # ==========================================
 st.markdown(
-    """
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    textwrap.dedent(
+        """
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
@@ -596,7 +598,8 @@ st.markdown(
         box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
     }
     </style>
-    """,
+    """
+    ).strip(),
     unsafe_allow_html=True,
 )
 
@@ -639,13 +642,15 @@ if model_status == ModelStatus.READY:
     if metrics_data and "test_accuracy" in metrics_data:
         test_acc_sidebar = metrics_data["test_accuracy"] * 100.0
         st.sidebar.markdown(
-            f"""
-            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 12px;">
-                <span style="font-size: 0.75rem; color: #10B981; font-weight: 700; letter-spacing: 0.05em;">MNIST TEST ACCURACY</span>
-                <div style="font-size: 1.4rem; font-weight: 800; color: #F8FAFC;">{test_acc_sidebar:.2f}%</div>
-                <span style="font-size: 0.72rem; color: #94A3B8;">10,000 official test samples</span>
-            </div>
-            """,
+            textwrap.dedent(
+                f"""
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 12px;">
+                    <span style="font-size: 0.75rem; color: #10B981; font-weight: 700; letter-spacing: 0.05em;">MNIST TEST ACCURACY</span>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #F8FAFC;">{test_acc_sidebar:.2f}%</div>
+                    <span style="font-size: 0.72rem; color: #94A3B8;">10,000 official test samples</span>
+                </div>
+                """
+            ).strip(),
             unsafe_allow_html=True,
         )
 elif model_status == ModelStatus.MISSING:
@@ -702,32 +707,38 @@ if st.sidebar.button("🧹 Clear Drawing Canvas", use_container_width=True):
 st.sidebar.markdown("---")
 st.sidebar.subheader("👤 Developer Profile")
 st.sidebar.markdown(
-    f"""
-    **{DEVELOPER.full_name}**  
-    *{DEVELOPER.designation}*  
-    {DEVELOPER.department}  
-    {DEVELOPER.university}
-    """
+    textwrap.dedent(
+        f"""
+        **{DEVELOPER.full_name}**  
+        *{DEVELOPER.designation}*  
+        {DEVELOPER.department}  
+        {DEVELOPER.university}
+        """
+    ).strip()
 )
 st.sidebar.markdown(
-    f"""<div class="sidebar-chip-container">
-<a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="sidebar-chip sidebar-chip-github">
-<span style="display:flex;align-items:center;">{ICON_GITHUB}</span>
-<span>GitHub Profile</span>
-</a>
-<a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="sidebar-chip sidebar-chip-linkedin">
-<span style="display:flex;align-items:center;color:#0A66C2;">{ICON_LINKEDIN}</span>
-<span>LinkedIn Profile</span>
-</a>
-<a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="sidebar-chip sidebar-chip-whatsapp">
-<span style="display:flex;align-items:center;color:#25D366;">{ICON_WHATSAPP}</span>
-<span>WhatsApp Chat</span>
-</a>
-<a href="{DEVELOPER.email_mailto}" class="sidebar-chip sidebar-chip-email">
-<span style="display:flex;align-items:center;color:#EA4335;">{ICON_EMAIL}</span>
-<span>Send Email</span>
-</a>
-</div>""",
+    textwrap.dedent(
+        f"""
+        <div class="sidebar-chip-container">
+            <a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="sidebar-chip sidebar-chip-github">
+                <span style="display:flex;align-items:center;">{ICON_GITHUB}</span>
+                <span>GitHub Profile</span>
+            </a>
+            <a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="sidebar-chip sidebar-chip-linkedin">
+                <span style="display:flex;align-items:center;color:#0A66C2;">{ICON_LINKEDIN}</span>
+                <span>LinkedIn Profile</span>
+            </a>
+            <a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="sidebar-chip sidebar-chip-whatsapp">
+                <span style="display:flex;align-items:center;color:#25D366;">{ICON_WHATSAPP}</span>
+                <span>WhatsApp Chat</span>
+            </a>
+            <a href="{DEVELOPER.email_mailto}" class="sidebar-chip sidebar-chip-email">
+                <span style="display:flex;align-items:center;color:#EA4335;">{ICON_EMAIL}</span>
+                <span>Send Email</span>
+            </a>
+        </div>
+        """
+    ).strip(),
     unsafe_allow_html=True,
 )
 
@@ -745,20 +756,22 @@ else:
     accuracy_badge_html = f'<span class="tech-badge tech-badge-warning">⚠️ Model: {model_status.value} (Not Evaluated)</span>'
 
 st.markdown(
-    f"""
-    <div class="hero-container">
-        <div class="hero-title">{APP_CONFIG.app_title}</div>
-        <div class="hero-subtitle">{APP_CONFIG.app_subtitle}</div>
-        <div class="hero-desc">{APP_CONFIG.app_tagline}</div>
-        <div class="badge-container">
-            <span class="tech-badge">🐍 Python 3.12</span>
-            <span class="tech-badge">🧠 TensorFlow 2.x & Keras</span>
-            <span class="tech-badge">⚡ Artificial Neural Network (MLP)</span>
-            <span class="tech-badge">📊 MNIST Dataset (60k Train / 10k Test)</span>
-            {accuracy_badge_html}
+    textwrap.dedent(
+        f"""
+        <div class="hero-container">
+            <div class="hero-title">{APP_CONFIG.app_title}</div>
+            <div class="hero-subtitle">{APP_CONFIG.app_subtitle}</div>
+            <div class="hero-desc">{APP_CONFIG.app_tagline}</div>
+            <div class="badge-container">
+                <span class="tech-badge">🐍 Python 3.12</span>
+                <span class="tech-badge">🧠 TensorFlow 2.x & Keras</span>
+                <span class="tech-badge">⚡ Artificial Neural Network (MLP)</span>
+                <span class="tech-badge">📊 MNIST Dataset (60k Train / 10k Test)</span>
+                {accuracy_badge_html}
+            </div>
         </div>
-    </div>
-    """,
+        """
+    ).strip(),
     unsafe_allow_html=True,
 )
 
@@ -773,14 +786,9 @@ with nav_col2:
         st.session_state.current_section = "📊 Model Evaluation"
         st.rerun()
 with nav_col3:
-    repo_target_url = getattr(
-        APP_CONFIG,
-        "repo_url",
-        getattr(DEVELOPER, "repo_url", "https://github.com/TuhassinulArnob/HandWriting_Detection_simpleANN"),
-    )
     st.link_button(
         "💻 View Source Code",
-        url=repo_target_url,
+        url=APP_CONFIG.repo_url,
         use_container_width=True,
     )
 
@@ -897,13 +905,15 @@ if active_section == "✍️ Drawing Studio":
 
                     with col_p_res:
                         st.markdown(
-                            f"""
-                            <div class="prediction-container">
-                                <div class="pred-label">Predicted Digit</div>
-                                <div class="pred-digit">{predicted_class}</div>
-                                <div class="pred-confidence">{confidence:.2f}% Confidence</div>
-                            </div>
-                            """,
+                            textwrap.dedent(
+                                f"""
+                                <div class="prediction-container">
+                                    <div class="pred-label">Predicted Digit</div>
+                                    <div class="pred-digit">{predicted_class}</div>
+                                    <div class="pred-confidence">{confidence:.2f}% Confidence</div>
+                                </div>
+                                """
+                            ).strip(),
                             unsafe_allow_html=True,
                         )
 
@@ -981,44 +991,52 @@ elif active_section == "📊 Model Evaluation":
         with col_m1:
             test_acc_display = metrics_data.get("test_accuracy", 0.0) * 100.0
             st.markdown(
-                f"""
-                <div class="metric-card-box">
-                    <div class="metric-card-title">Test Accuracy</div>
-                    <div class="metric-card-val" style="color: #38BDF8;">{test_acc_display:.2f}%</div>
-                </div>
-                """,
+                textwrap.dedent(
+                    f"""
+                    <div class="metric-card-box">
+                        <div class="metric-card-title">Test Accuracy</div>
+                        <div class="metric-card-val" style="color: #38BDF8;">{test_acc_display:.2f}%</div>
+                    </div>
+                    """
+                ).strip(),
                 unsafe_allow_html=True,
             )
         with col_m2:
             test_loss_display = metrics_data.get("test_loss", 0.0)
             st.markdown(
-                f"""
-                <div class="metric-card-box">
-                    <div class="metric-card-title">Test Loss (Cross-Entropy)</div>
-                    <div class="metric-card-val" style="color: #F59E0B;">{test_loss_display:.4f}</div>
-                </div>
-                """,
+                textwrap.dedent(
+                    f"""
+                    <div class="metric-card-box">
+                        <div class="metric-card-title">Test Loss (Cross-Entropy)</div>
+                        <div class="metric-card-val" style="color: #F59E0B;">{test_loss_display:.4f}</div>
+                    </div>
+                    """
+                ).strip(),
                 unsafe_allow_html=True,
             )
         with col_m3:
             macro_f1_display = metrics_data.get("macro_f1_score", 0.0) * 100.0
             st.markdown(
-                f"""
-                <div class="metric-card-box">
-                    <div class="metric-card-title">Macro F1-Score</div>
-                    <div class="metric-card-val" style="color: #34D399;">{macro_f1_display:.2f}%</div>
-                </div>
-                """,
+                textwrap.dedent(
+                    f"""
+                    <div class="metric-card-box">
+                        <div class="metric-card-title">Macro F1-Score</div>
+                        <div class="metric-card-val" style="color: #34D399;">{macro_f1_display:.2f}%</div>
+                    </div>
+                    """
+                ).strip(),
                 unsafe_allow_html=True,
             )
         with col_m4:
             st.markdown(
-                """
-                <div class="metric-card-box">
-                    <div class="metric-card-title">Test Partition Size</div>
-                    <div class="metric-card-val" style="color: #A78BFA;">10,000</div>
-                </div>
-                """,
+                textwrap.dedent(
+                    """
+                    <div class="metric-card-box">
+                        <div class="metric-card-title">Test Partition Size</div>
+                        <div class="metric-card-val" style="color: #A78BFA;">10,000</div>
+                    </div>
+                    """
+                ).strip(),
                 unsafe_allow_html=True,
             )
 
@@ -1086,12 +1104,14 @@ elif active_section == "📊 Model Evaluation":
 elif active_section == "🧠 Architecture & Theory":
     st.markdown("### 🧠 Artificial Neural Network (Multilayer Perceptron) Architecture")
     st.markdown(
-        """
-        This project intentionally implements a **Fully Connected Artificial Neural Network (ANN)**,
-        also designated as a **Multilayer Perceptron (MLP)**. Rather than utilizing convolutional layers,
-        this architecture illustrates the core foundations of deep learning: linear combinations, non-linear activation
-        functions, loss measurement, and gradient backpropagation.
-        """
+        textwrap.dedent(
+            """
+            This project intentionally implements a **Fully Connected Artificial Neural Network (ANN)**,
+            also designated as a **Multilayer Perceptron (MLP)**. Rather than utilizing convolutional layers,
+            this architecture illustrates the core foundations of deep learning: linear combinations, non-linear activation
+            functions, loss measurement, and gradient backpropagation.
+            """
+        ).strip()
     )
 
     st.markdown("#### 1. Layer Specifications & Trainable Parameters")
@@ -1141,15 +1161,17 @@ elif active_section == "🧠 Architecture & Theory":
     st.markdown("---")
     st.markdown("#### 3. ANN vs. Convolutional Neural Networks (CNN)")
     st.markdown(
-        """
-        | Dimension | Fully Connected ANN (This Project) | Convolutional Neural Network (CNN) |
-        | :--- | :--- | :--- |
-        | **Input Format** | Flattened 1D vector (784 features) | 2D/3D spatial matrix ($28 \times 28 \times 1$) |
-        | **Spatial Invariance** | Low (sensitive to translation & off-centering) | High (translation-invariant convolutional kernels) |
-        | **Parameter Efficiency** | Higher per connection ($109,386$ parameters) | Shared kernel weights reduce connection redundancy |
-        | **Hardware Requirements** | Runs smoothly on any basic CPU in seconds | Benefits significantly from GPU acceleration |
-        | **Academic Purpose** | Clear demonstration of foundational MLP mechanics | Advanced spatial computer vision |
-        """
+        textwrap.dedent(
+            """
+            | Dimension | Fully Connected ANN (This Project) | Convolutional Neural Network (CNN) |
+            | :--- | :--- | :--- |
+            | **Input Format** | Flattened 1D vector (784 features) | 2D/3D spatial matrix ($28 \times 28 \times 1$) |
+            | **Spatial Invariance** | Low (sensitive to translation & off-centering) | High (translation-invariant convolutional kernels) |
+            | **Parameter Efficiency** | Higher per connection ($109,386$ parameters) | Shared kernel weights reduce connection redundancy |
+            | **Hardware Requirements** | Runs smoothly on any basic CPU in seconds | Benefits significantly from GPU acceleration |
+            | **Academic Purpose** | Clear demonstration of foundational MLP mechanics | Advanced spatial computer vision |
+            """
+        ).strip()
     )
 
 
@@ -1161,47 +1183,53 @@ elif active_section == "👤 Meet the Developer":
     st.caption("Academic profile and direct contact channels.")
 
     st.markdown(
-        f"""
-        <div class="dev-profile-card">
-            <div class="dev-name">{DEVELOPER.full_name}</div>
-            <div class="dev-role">{DEVELOPER.designation}</div>
-            <div class="dev-affil">{DEVELOPER.affiliation_line}</div>
-        </div>
-        """,
+        textwrap.dedent(
+            f"""
+            <div class="dev-profile-card">
+                <div class="dev-name">{DEVELOPER.full_name}</div>
+                <div class="dev-role">{DEVELOPER.designation}</div>
+                <div class="dev-affil">{DEVELOPER.affiliation_line}</div>
+            </div>
+            """
+        ).strip(),
         unsafe_allow_html=True,
     )
 
     st.markdown(
-        f"""<div class="brand-btn-grid">
-<a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="brand-btn brand-btn-github">
-<span class="brand-btn-icon">{ICON_GITHUB}</span>
-<div class="brand-btn-content">
-<span class="brand-btn-title">GitHub</span>
-<span class="brand-btn-subtitle">@TuhassinulArnob</span>
-</div>
-</a>
-<a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="brand-btn brand-btn-linkedin">
-<span class="brand-btn-icon">{ICON_LINKEDIN}</span>
-<div class="brand-btn-content">
-<span class="brand-btn-title">LinkedIn</span>
-<span class="brand-btn-subtitle">in/tuhassinularnob</span>
-</div>
-</a>
-<a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="brand-btn brand-btn-whatsapp">
-<span class="brand-btn-icon">{ICON_WHATSAPP}</span>
-<div class="brand-btn-content">
-<span class="brand-btn-title">WhatsApp</span>
-<span class="brand-btn-subtitle">{DEVELOPER.phone}</span>
-</div>
-</a>
-<a href="{DEVELOPER.email_mailto}" class="brand-btn brand-btn-email">
-<span class="brand-btn-icon">{ICON_EMAIL}</span>
-<div class="brand-btn-content">
-<span class="brand-btn-title">Email</span>
-<span class="brand-btn-subtitle">{DEVELOPER.email}</span>
-</div>
-</a>
-</div>""",
+        textwrap.dedent(
+            f"""
+            <div class="brand-btn-grid">
+                <a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="brand-btn brand-btn-github">
+                    <span class="brand-btn-icon">{ICON_GITHUB}</span>
+                    <div class="brand-btn-content">
+                        <span class="brand-btn-title">GitHub</span>
+                        <span class="brand-btn-subtitle">@TuhassinulArnob</span>
+                    </div>
+                </a>
+                <a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="brand-btn brand-btn-linkedin">
+                    <span class="brand-btn-icon">{ICON_LINKEDIN}</span>
+                    <div class="brand-btn-content">
+                        <span class="brand-btn-title">LinkedIn</span>
+                        <span class="brand-btn-subtitle">in/tuhassinularnob</span>
+                    </div>
+                </a>
+                <a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="brand-btn brand-btn-whatsapp">
+                    <span class="brand-btn-icon">{ICON_WHATSAPP}</span>
+                    <div class="brand-btn-content">
+                        <span class="brand-btn-title">WhatsApp</span>
+                        <span class="brand-btn-subtitle">{DEVELOPER.phone}</span>
+                    </div>
+                </a>
+                <a href="{DEVELOPER.email_mailto}" class="brand-btn brand-btn-email">
+                    <span class="brand-btn-icon">{ICON_EMAIL}</span>
+                    <div class="brand-btn-content">
+                        <span class="brand-btn-title">Email</span>
+                        <span class="brand-btn-subtitle">{DEVELOPER.email}</span>
+                    </div>
+                </a>
+            </div>
+            """
+        ).strip(),
         unsafe_allow_html=True,
     )
 
@@ -1209,42 +1237,52 @@ elif active_section == "👤 Meet the Developer":
     contact_col1, contact_col2 = st.columns(2)
     with contact_col1:
         st.markdown(
-            f"""<div class="contact-detail-card">
-<div class="contact-detail-item">
-<span class="contact-detail-icon" style="background: rgba(234, 67, 53, 0.15); color: #EA4335;">{ICON_EMAIL}</span>
-<div><strong>Email:</strong> <a href="{DEVELOPER.email_mailto}" class="contact-detail-link">{DEVELOPER.email}</a></div>
-</div>
-<div class="contact-detail-item">
-<span class="contact-detail-icon" style="background: rgba(37, 211, 102, 0.15); color: #25D366;">{ICON_WHATSAPP}</span>
-<div><strong>WhatsApp / Phone:</strong> <a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="contact-detail-link">{DEVELOPER.phone}</a></div>
-</div>
-</div>""",
+            textwrap.dedent(
+                f"""
+                <div class="contact-detail-card">
+                    <div class="contact-detail-item">
+                        <span class="contact-detail-icon" style="background: rgba(234, 67, 53, 0.15); color: #EA4335;">{ICON_EMAIL}</span>
+                        <div><strong>Email:</strong> <a href="{DEVELOPER.email_mailto}" class="contact-detail-link">{DEVELOPER.email}</a></div>
+                    </div>
+                    <div class="contact-detail-item">
+                        <span class="contact-detail-icon" style="background: rgba(37, 211, 102, 0.15); color: #25D366;">{ICON_WHATSAPP}</span>
+                        <div><strong>WhatsApp / Phone:</strong> <a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="contact-detail-link">{DEVELOPER.phone}</a></div>
+                    </div>
+                </div>
+                """
+            ).strip(),
             unsafe_allow_html=True,
         )
     with contact_col2:
         st.markdown(
-            f"""<div class="contact-detail-card">
-<div class="contact-detail-item">
-<span class="contact-detail-icon" style="background: rgba(255, 255, 255, 0.1); color: #F0F6FC;">{ICON_GITHUB}</span>
-<div><strong>GitHub:</strong> <a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="contact-detail-link">github.com/TuhassinulArnob</a></div>
-</div>
-<div class="contact-detail-item">
-<span class="contact-detail-icon" style="background: rgba(10, 102, 194, 0.15); color: #0A66C2;">{ICON_LINKEDIN}</span>
-<div><strong>LinkedIn:</strong> <a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="contact-detail-link">linkedin.com/in/tuhassinularnob</a></div>
-</div>
-</div>""",
+            textwrap.dedent(
+                f"""
+                <div class="contact-detail-card">
+                    <div class="contact-detail-item">
+                        <span class="contact-detail-icon" style="background: rgba(255, 255, 255, 0.1); color: #F0F6FC;">{ICON_GITHUB}</span>
+                        <div><strong>GitHub:</strong> <a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="contact-detail-link">github.com/TuhassinulArnob</a></div>
+                    </div>
+                    <div class="contact-detail-item">
+                        <span class="contact-detail-icon" style="background: rgba(10, 102, 194, 0.15); color: #0A66C2;">{ICON_LINKEDIN}</span>
+                        <div><strong>LinkedIn:</strong> <a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="contact-detail-link">linkedin.com/in/tuhassinularnob</a></div>
+                    </div>
+                </div>
+                """
+            ).strip(),
             unsafe_allow_html=True,
         )
 
     st.markdown("---")
     st.markdown(
-        """
-        #### 🎓 Project Academic Context
-        This application was engineered as an undergraduate Artificial Intelligence and Machine Learning project
-        in the **Department of ICT, Islamic University, Bangladesh**. It demonstrates full-lifecycle machine learning development:
-        dataset ingestion, data preprocessing, neural architecture definition, reproducible training, unbiased test evaluation,
-        and deployment-ready interactive user interface design.
-        """
+        textwrap.dedent(
+            """
+            #### 🎓 Project Academic Context
+            This application was engineered as an undergraduate Artificial Intelligence and Machine Learning project
+            in the **Department of ICT, Islamic University, Bangladesh**. It demonstrates full-lifecycle machine learning development:
+            dataset ingestion, data preprocessing, neural architecture definition, reproducible training, unbiased test evaluation,
+            and deployment-ready interactive user interface design.
+            """
+        ).strip()
     )
 
 
@@ -1271,21 +1309,25 @@ with footer_c2:
     )
 
     st.markdown(
-        f"""<div class="footer-chips-row">
-<a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="footer-chip">
-<span style="color: #F0F6FC;">{ICON_GITHUB}</span> GitHub
-</a>
-<a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="footer-chip">
-<span style="color: #0A66C2;">{ICON_LINKEDIN}</span> LinkedIn
-</a>
-<a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="footer-chip">
-<span style="color: #25D366;">{ICON_WHATSAPP}</span> WhatsApp
-</a>
-<a href="{DEVELOPER.email_mailto}" class="footer-chip">
-<span style="color: #EA4335;">{ICON_EMAIL}</span> Email
-</a>
-{portfolio_chip_html}
-</div>""",
+        textwrap.dedent(
+            f"""
+            <div class="footer-chips-row">
+                <a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="footer-chip">
+                    <span style="color: #F0F6FC;">{ICON_GITHUB}</span> GitHub
+                </a>
+                <a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="footer-chip">
+                    <span style="color: #0A66C2;">{ICON_LINKEDIN}</span> LinkedIn
+                </a>
+                <a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="footer-chip">
+                    <span style="color: #25D366;">{ICON_WHATSAPP}</span> WhatsApp
+                </a>
+                <a href="{DEVELOPER.email_mailto}" class="footer-chip">
+                    <span style="color: #EA4335;">{ICON_EMAIL}</span> Email
+                </a>
+                {portfolio_chip_html}
+            </div>
+            """
+        ).strip(),
         unsafe_allow_html=True,
     )
 
