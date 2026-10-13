@@ -22,6 +22,7 @@ class DeveloperConfig:
     whatsapp_url: str = "https://wa.me/8801811860339"
     github_url: str = "https://github.com/TuhassinulArnob"
     linkedin_url: str = "https://www.linkedin.com/in/tuhassinularnob/"
+    repo_url: str = "https://github.com/TuhassinulArnob/HandWriting_Detection_simpleANN"
     # Portfolio URL is intentionally None until configured by the developer
     portfolio_url: Optional[str] = None
 

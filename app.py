@@ -474,9 +474,14 @@ with nav_col2:
         st.session_state.current_section = "📊 Model Evaluation"
         st.rerun()
 with nav_col3:
+    repo_target_url = getattr(
+        APP_CONFIG,
+        "repo_url",
+        getattr(DEVELOPER, "repo_url", "https://github.com/TuhassinulArnob/HandWriting_Detection_simpleANN"),
+    )
     st.link_button(
         "💻 View Source Code",
-        url=APP_CONFIG.repo_url,
+        url=repo_target_url,
         use_container_width=True,
     )
 
