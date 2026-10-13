@@ -1,0 +1,18 @@
+# Handwritten Digit Recognition Using Artificial Neural Network (ANN)
+# Core Machine Learning & Neural Network Libraries
+tensorflow>=2.16.0
+numpy>=1.26.0
+
+# Scientific & Evaluation Libraries
+scikit-learn>=1.4.0
+matplotlib>=3.8.0
+
+# Image Processing
+pillow>=10.2.0
+
+# Web Application & Drawing Canvas Interface
+streamlit>=1.32.0
+streamlit-drawable-canvas==0.9.3
+
+# Unit Testing
+pytest>=8.0.0
