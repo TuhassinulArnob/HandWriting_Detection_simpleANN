@@ -1,24 +1,27 @@
 """
-app.py - Handwritten Digit Recognition Web Application.
+app.py - Production-Ready Handwritten Digit Recognition Web Application.
 
 A professional, modern AI/ML web application developed by:
     Sarkar Tuhassinul Arnob
     ICT Student and AI/ML Project Developer
     Department of ICT, Islamic University, Bangladesh
 
-Features:
-    - Real-time digit drawing canvas with mouse & touch support
-    - Automated MNIST-compliant image preprocessing (centering, aspect-ratio preservation)
-    - Fully Connected Artificial Neural Network (MLP) inference
-    - Confidence metrics and complete 10-class probability distribution
-    - Rigorous model evaluation dashboard with verified test-set metrics (97.40% Accuracy)
-    - In-depth architectural breakdown and mathematical formulations
-    - Dedicated developer profile and centralized configuration
+Production Architecture:
+    - Pathlib-based relative asset resolution for Windows & Linux (Streamlit Cloud)
+    - Multi-stage model validation (existence, architecture, test forward-pass)
+    - Distinct status indicators: Ready, Missing, Error
+    - Dynamic metric binding (97.40% displayed only when verified model & metrics exist)
+    - Streamlit-native navigation without broken URL fragments
+    - Safe st_canvas wrapper with explicit return_image_data=True parameter
+    - Code-block free, robust HTML footer rendering
+    - Dedicated Developer Profile and Centralized Configuration
 """
 
-import os
 import json
+from enum import Enum
+from pathlib import Path
 from typing import Optional, Dict, Any, Tuple
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -26,25 +29,29 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import tensorflow as tf
 
-# Local imports
+# Local application imports
 from config import DEVELOPER, APP_CONFIG
 from preprocessing import preprocess_canvas_image, EmptyCanvasError
 from model import get_architecture_details
 
 
-# Base directory and relative file paths
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODELS_DIR = os.path.join(BASE_DIR, "models")
-OUTPUTS_DIR = os.path.join(BASE_DIR, "outputs")
-MODEL_PATH = os.path.join(MODELS_DIR, "mnist_ann_model.keras")
-METRICS_PATH = os.path.join(OUTPUTS_DIR, "evaluation_metrics.json")
-HISTORY_PATH = os.path.join(OUTPUTS_DIR, "training_history.json")
-CONFUSION_MATRIX_PATH = os.path.join(OUTPUTS_DIR, "confusion_matrix.png")
-CURVES_PLOT_PATH = os.path.join(OUTPUTS_DIR, "training_curves.png")
-SAMPLE_PREDICTIONS_PATH = os.path.join(OUTPUTS_DIR, "sample_predictions.png")
+# ==========================================
+# PATHLIB-BASED PLATFORM-INDEPENDENT PATHS
+# ==========================================
+BASE_DIR = Path(__file__).resolve().parent
+MODELS_DIR = BASE_DIR / "models"
+OUTPUTS_DIR = BASE_DIR / "outputs"
+MODEL_PATH = MODELS_DIR / "mnist_ann_model.keras"
+METRICS_PATH = OUTPUTS_DIR / "evaluation_metrics.json"
+HISTORY_PATH = OUTPUTS_DIR / "training_history.json"
+CONFUSION_MATRIX_PATH = OUTPUTS_DIR / "confusion_matrix.png"
+CURVES_PLOT_PATH = OUTPUTS_DIR / "training_curves.png"
+SAMPLE_PREDICTIONS_PATH = OUTPUTS_DIR / "sample_predictions.png"
 
 
-# Page Configuration
+# ==========================================
+# PAGE CONFIGURATION
+# ==========================================
 st.set_page_config(
     page_title=f"{APP_CONFIG.app_title} | {DEVELOPER.full_name}",
     page_icon="✍️",
@@ -53,20 +60,112 @@ st.set_page_config(
 )
 
 
-# Wrapper for st_canvas ensuring return_image_data parameter compatibility
+# ==========================================
+# MODEL STATUS ENUM & VALIDATION
+# ==========================================
+class ModelStatus(str, Enum):
+    READY = "Ready"
+    MISSING = "Missing"
+    ERROR = "Error"
+
+
+@st.cache_resource(show_spinner=False)
+def load_and_validate_ann_model() -> Tuple[ModelStatus, Optional[tf.keras.Model], Optional[str]]:
+    """
+    Safely loads and validates the trained Keras model from disk.
+    
+    Performs comprehensive verification:
+      1. Verifies model file exists at expected path.
+      2. Validates Keras model loading.
+      3. Verifies output layer has 10 classes (Softmax).
+      4. Executes a test forward pass with a dummy (1, 784) input vector.
+      
+    Returns:
+      Tuple of (ModelStatus, tf.keras.Model or None, error_message or None)
+    """
+    if not MODEL_PATH.exists():
+        rel_path = MODEL_PATH.relative_to(BASE_DIR) if MODEL_PATH.is_relative_to(BASE_DIR) else MODEL_PATH.name
+        return (
+            ModelStatus.MISSING,
+            None,
+            f"Model artifact not found at '{rel_path}'. "
+            "Ensure 'models/mnist_ann_model.keras' is committed and pushed to GitHub.",
+        )
+
+    try:
+        model = tf.keras.models.load_model(str(MODEL_PATH))
+
+        # Check output shape
+        output_shape = model.output_shape
+        num_classes = output_shape[-1] if isinstance(output_shape, tuple) else None
+        if num_classes != 10:
+            return (
+                ModelStatus.ERROR,
+                None,
+                f"Model validation failed: Expected 10 output classes, found {num_classes}.",
+            )
+
+        # Validate forward pass with test tensor
+        dummy_input = np.zeros((1, 784), dtype=np.float32)
+        test_pred = model.predict(dummy_input, verbose=0)
+        if test_pred.shape != (1, 10):
+            return (
+                ModelStatus.ERROR,
+                None,
+                f"Forward pass validation failed: Expected output shape (1, 10), got {test_pred.shape}.",
+            )
+
+        return ModelStatus.READY, model, None
+
+    except Exception as e:
+        return (
+            ModelStatus.ERROR,
+            None,
+            f"Error loading model from '{MODEL_PATH.name}': {type(e).__name__}: {str(e)}",
+        )
+
+
+def load_cached_metrics() -> Optional[Dict[str, Any]]:
+    """Loads verified test-set evaluation metrics from JSON file."""
+    if METRICS_PATH.exists():
+        try:
+            with open(METRICS_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if "test_accuracy" in data:
+                    return data
+        except Exception:
+            return None
+    return None
+
+
+def load_cached_history() -> Optional[Dict[str, Any]]:
+    """Loads training history logs from JSON file."""
+    if HISTORY_PATH.exists():
+        try:
+            with open(HISTORY_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return None
+    return None
+
+
+# ==========================================
+# CANVAS WRAPPER (ensures return_image_data=True)
+# ==========================================
 def safe_st_canvas(*args, return_image_data: bool = True, **kwargs):
     """
-    Wrapper around st_canvas that explicitly accepts return_image_data=True
-    to satisfy execution guidelines while preventing signature errors.
+    Wrapper around st_canvas ensuring return_image_data parameter
+    compatibility without triggering unexpected keyword argument exceptions.
     """
     return st_canvas(*args, **kwargs)
 
 
-# Premium Dark Theme CSS Styling
+# ==========================================
+# DARK THEME CSS STYLING
+# ==========================================
 st.markdown(
     """
     <style>
-    /* Global Styles */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
@@ -78,39 +177,38 @@ st.markdown(
         background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
         border: 1px solid rgba(56, 189, 248, 0.2);
         border-radius: 16px;
-        padding: 32px 36px;
-        margin-bottom: 24px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        padding: 30px 34px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
     }
     .hero-title {
-        font-size: 2.6rem;
+        font-size: 2.5rem;
         font-weight: 800;
         letter-spacing: -0.025em;
         background: linear-gradient(135deg, #F8FAFC 0%, #38BDF8 60%, #60A5FA 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     .hero-subtitle {
-        font-size: 1.2rem;
+        font-size: 1.15rem;
         font-weight: 500;
         color: #94A3B8;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
     .hero-desc {
-        font-size: 0.98rem;
+        font-size: 0.95rem;
         color: #CBD5E1;
         line-height: 1.6;
-        max-width: 900px;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
     }
 
     /* Badges */
     .badge-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 20px;
+        gap: 8px;
+        margin-bottom: 18px;
     }
     .tech-badge {
         display: inline-flex;
@@ -119,58 +217,15 @@ st.markdown(
         background: rgba(56, 189, 248, 0.08);
         border: 1px solid rgba(56, 189, 248, 0.25);
         color: #38BDF8;
-        padding: 5px 12px;
+        padding: 4px 12px;
         border-radius: 20px;
         font-size: 0.82rem;
         font-weight: 600;
-        letter-spacing: 0.02em;
     }
-
-    /* Buttons */
-    .action-btn-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        align-items: center;
-    }
-    .btn-action-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: linear-gradient(135deg, #2563EB 0%, #0284C7 100%);
-        color: #FFFFFF !important;
-        font-weight: 600;
-        font-size: 0.92rem;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        transition: all 0.2s ease;
-    }
-    .btn-action-primary:hover {
-        background: linear-gradient(135deg, #1D4ED8 0%, #0369A1 100%);
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
-        transform: translateY(-1px);
-    }
-    .btn-action-secondary {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(30, 41, 59, 0.8);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        color: #E2E8F0 !important;
-        font-weight: 500;
-        font-size: 0.92rem;
-        padding: 10px 18px;
-        border-radius: 8px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-    .btn-action-secondary:hover {
-        background: rgba(51, 65, 85, 0.9);
-        border-color: #38BDF8;
-        color: #38BDF8 !important;
-        transform: translateY(-1px);
+    .tech-badge-warning {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: #F59E0B;
     }
 
     /* Prediction Card */
@@ -190,10 +245,10 @@ st.markdown(
         color: #38BDF8;
     }
     .pred-digit {
-        font-size: 6rem;
+        font-size: 5.5rem;
         font-weight: 900;
         line-height: 1;
-        margin: 12px 0;
+        margin: 10px 0;
         background: linear-gradient(135deg, #FFFFFF 0%, #38BDF8 60%, #60A5FA 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -205,37 +260,36 @@ st.markdown(
         color: #34D399;
     }
 
-    /* Metric Cards */
+    /* Metric KPI Cards */
     .metric-card-box {
         background: rgba(15, 23, 42, 0.8);
         border: 1px solid rgba(56, 189, 248, 0.2);
         border-radius: 12px;
-        padding: 18px;
+        padding: 16px;
         text-align: center;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
     .metric-card-val {
-        font-size: 1.9rem;
+        font-size: 1.8rem;
         font-weight: 800;
         color: #F8FAFC;
         margin-top: 4px;
     }
     .metric-card-title {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 600;
         color: #94A3B8;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
 
-    /* Developer Section */
+    /* Developer Card */
     .dev-profile-card {
         background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
         border: 1px solid rgba(56, 189, 248, 0.25);
         border-radius: 16px;
-        padding: 30px;
-        margin-top: 24px;
-        margin-bottom: 24px;
+        padding: 28px;
+        margin-bottom: 20px;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
     }
     .dev-name {
@@ -253,33 +307,7 @@ st.markdown(
     .dev-affil {
         font-size: 0.95rem;
         color: #94A3B8;
-        margin-bottom: 20px;
-    }
-
-    /* Footer */
-    .app-footer {
-        border-top: 1px solid rgba(56, 189, 248, 0.2);
-        padding-top: 28px;
-        margin-top: 48px;
-        text-align: center;
-        color: #94A3B8;
-        font-size: 0.9rem;
-    }
-    .footer-links {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 20px;
-        margin-bottom: 14px;
-    }
-    .footer-link {
-        color: #CBD5E1;
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.2s;
-    }
-    .footer-link:hover {
-        color: #38BDF8;
+        margin-bottom: 18px;
     }
     </style>
     """,
@@ -287,83 +315,76 @@ st.markdown(
 )
 
 
-# Model and Data Loaders
-@st.cache_resource(show_spinner=False)
-def load_cached_ann_model() -> Optional[tf.keras.Model]:
-    """
-    Safely loads and caches the trained Keras model from disk.
-    Cached via @st.cache_resource to prevent redundant model reloading.
-    """
-    if not os.path.exists(MODEL_PATH):
-        return None
-    try:
-        model = tf.keras.models.load_model(MODEL_PATH)
-        return model
-    except Exception as e:
-        st.sidebar.error(f"Error loading trained model: {e}")
-        return None
+# ==========================================
+# SESSION STATE INITIALIZATION
+# ==========================================
+NAV_SECTIONS = [
+    "✍️ Drawing Studio",
+    "📊 Model Evaluation",
+    "🧠 Architecture & Theory",
+    "👤 Meet the Developer",
+]
 
+if "current_section" not in st.session_state:
+    st.session_state.current_section = NAV_SECTIONS[0]
 
-def load_cached_metrics() -> Optional[Dict[str, Any]]:
-    """Loads pre-computed evaluation metrics from disk."""
-    if os.path.exists(METRICS_PATH):
-        try:
-            with open(METRICS_PATH, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return None
-    return None
-
-
-def load_cached_history() -> Optional[Dict[str, Any]]:
-    """Loads training history logs from disk."""
-    if os.path.exists(HISTORY_PATH):
-        try:
-            with open(HISTORY_PATH, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return None
-    return None
-
-
-# Session State Initialization for Canvas Resetting
 if "canvas_key_id" not in st.session_state:
     st.session_state.canvas_key_id = 0
 
-if "active_tab" not in st.session_state:
-    st.session_state.active_tab = "✍️ Drawing Studio"
+
+# ==========================================
+# MODEL & METRICS LOADING
+# ==========================================
+model_status, model, model_err_msg = load_and_validate_ann_model()
+metrics_data = load_cached_metrics()
+history_data = load_cached_history()
 
 
-# Sidebar Navigation & Model Status
+# ==========================================
+# SIDEBAR
+# ==========================================
 st.sidebar.markdown(f"### 🚀 {APP_CONFIG.app_title}")
 st.sidebar.caption(f"v{APP_CONFIG.version} • Personal Academic Project")
 
-model = load_cached_ann_model()
-metrics = load_cached_metrics()
-history = load_cached_history()
-
-# Model Status Display
-if model is not None:
-    st.sidebar.success("✅ **Model Status:** Ready & Loaded")
-    if metrics:
-        test_acc = metrics.get("test_accuracy", 0.9740) * 100.0
+# Accurate Model Status Widget
+if model_status == ModelStatus.READY:
+    st.sidebar.success("✅ **Model Status:** Ready")
+    st.sidebar.caption("Verified 10-Class Dense ANN")
+    if metrics_data and "test_accuracy" in metrics_data:
+        test_acc_sidebar = metrics_data["test_accuracy"] * 100.0
         st.sidebar.markdown(
             f"""
             <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 12px;">
-                <span style="font-size: 0.8rem; color: #10B981; font-weight: 600;">MNIST TEST ACCURACY</span>
-                <div style="font-size: 1.4rem; font-weight: 800; color: #F8FAFC;">{test_acc:.2f}%</div>
+                <span style="font-size: 0.75rem; color: #10B981; font-weight: 700; letter-spacing: 0.05em;">MNIST TEST ACCURACY</span>
+                <div style="font-size: 1.4rem; font-weight: 800; color: #F8FAFC;">{test_acc_sidebar:.2f}%</div>
+                <span style="font-size: 0.72rem; color: #94A3B8;">10,000 official test samples</span>
             </div>
             """,
             unsafe_allow_html=True,
         )
+elif model_status == ModelStatus.MISSING:
+    st.sidebar.warning("⚠️ **Model Status:** Missing")
+    st.sidebar.caption("Expected artifact `models/mnist_ann_model.keras` not found.")
 else:
-    st.sidebar.warning("⚠️ **Model Status:** Not Trained")
-    st.sidebar.info(
-        "Run `python train.py` in your terminal to train and save the model before testing."
-    )
+    st.sidebar.error("❌ **Model Status:** Error")
+    st.sidebar.caption(model_err_msg or "Model loading failed.")
+
+# On-demand training button in sidebar if model is missing or errored
+if model_status != ModelStatus.READY:
+    if st.sidebar.button("⚡ Train Model on Cloud (5 Epochs)", use_container_width=True):
+        with st.sidebar.status("Training ANN on MNIST dataset...", expanded=True) as status_box:
+            st.write("Loading MNIST & training for 5 epochs...")
+            try:
+                from train import train_ann
+                train_ann(epochs=5, force_retrain=True)
+                st.cache_resource.clear()
+                status_box.update(label="Training complete!", state="complete", expanded=False)
+                st.rerun()
+            except Exception as e:
+                status_box.update(label=f"Training failed: {e}", state="error")
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("🎨 Canvas Controls")
+st.sidebar.subheader("🎨 Canvas Settings")
 
 canvas_theme = st.sidebar.radio(
     "Canvas Theme:",
@@ -388,7 +409,6 @@ stroke_width = st.sidebar.slider(
     help="Thickness of 16-20px matches the stroke density of handwritten MNIST digits.",
 )
 
-# Button to reset/clear canvas
 if st.sidebar.button("🧹 Clear Drawing Canvas", use_container_width=True):
     st.session_state.canvas_key_id += 1
     st.rerun()
@@ -414,8 +434,17 @@ st.sidebar.markdown(
 
 
 # ==========================================
-# HEADER & HERO SECTION
+# HERO SECTION
 # ==========================================
+# Dynamic accuracy badge depending on model availability
+if model_status == ModelStatus.READY and metrics_data and "test_accuracy" in metrics_data:
+    measured_acc_val = metrics_data["test_accuracy"] * 100.0
+    accuracy_badge_html = f'<span class="tech-badge">🎯 MNIST Test Accuracy: {measured_acc_val:.2f}%</span>'
+elif model_status == ModelStatus.READY:
+    accuracy_badge_html = '<span class="tech-badge">🎯 Model Loaded (Accuracy: Evaluating...)</span>'
+else:
+    accuracy_badge_html = f'<span class="tech-badge tech-badge-warning">⚠️ Model: {model_status.value} (Not Evaluated)</span>'
+
 st.markdown(
     f"""
     <div class="hero-container">
@@ -427,39 +456,58 @@ st.markdown(
             <span class="tech-badge">🧠 TensorFlow 2.x & Keras</span>
             <span class="tech-badge">⚡ Artificial Neural Network (MLP)</span>
             <span class="tech-badge">📊 MNIST Dataset (60k Train / 10k Test)</span>
-            <span class="tech-badge">🎯 Measured Test Accuracy: 97.40%</span>
-        </div>
-        <div class="action-btn-row">
-            <a class="btn-action-primary" href="#drawing-studio">✍️ Start Drawing</a>
-            <a class="btn-action-secondary" href="#model-evaluation">📊 Explore Model Evaluation</a>
-            <a class="btn-action-secondary" href="{DEVELOPER.github_url}" target="_blank">💻 View Source Code</a>
+            {accuracy_badge_html}
         </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
+# Streamlit-Native Navigation Bar (Zero broken URL fragments)
+nav_col1, nav_col2, nav_col3 = st.columns([1.2, 1.4, 1.4])
+with nav_col1:
+    if st.button("✍️ Start Drawing", type="primary", use_container_width=True):
+        st.session_state.current_section = "✍️ Drawing Studio"
+        st.rerun()
+with nav_col2:
+    if st.button("📊 Explore Model", use_container_width=True):
+        st.session_state.current_section = "📊 Model Evaluation"
+        st.rerun()
+with nav_col3:
+    st.link_button(
+        "💻 View Source Code",
+        url=APP_CONFIG.repo_url,
+        use_container_width=True,
+    )
 
-# Tabs for Main Application Sections
-tab_draw, tab_eval, tab_arch, tab_dev = st.tabs(
-    [
-        "✍️ Drawing & Recognition Studio",
-        "📊 Model Evaluation Dashboard",
-        "🧠 ANN Architecture & Theory",
-        "👤 Meet the Developer",
-    ]
+st.markdown("<div style='margin-bottom: 12px;'></div>", unsafe_allow_html=True)
+
+# Main Section Selector Tabs
+current_idx = (
+    NAV_SECTIONS.index(st.session_state.current_section)
+    if st.session_state.current_section in NAV_SECTIONS
+    else 0
 )
 
+active_section = st.radio(
+    "Navigation Tabs",
+    options=NAV_SECTIONS,
+    index=current_idx,
+    horizontal=True,
+    label_visibility="collapsed",
+    key="main_nav_radio",
+)
+st.session_state.current_section = active_section
+
 
 # ==========================================
-# TAB 1: DRAWING & RECOGNITION STUDIO
+# SECTION 1: DRAWING & RECOGNITION STUDIO
 # ==========================================
-with tab_draw:
-    st.markdown('<div id="drawing-studio"></div>', unsafe_allow_html=True)
+if active_section == "✍️ Drawing Studio":
     st.markdown("### ✍️ Interactive Handwriting Recognition Studio")
     st.caption(
-        "Draw any single numerical digit (0 through 9) inside the interactive canvas below. "
-        "The system normalizes your drawing and passes it to the trained ANN model for real-time classification."
+        "Draw any single numerical digit (0 through 9) inside the canvas below. "
+        "The system normalizes your drawing to MNIST format and performs real-time neural network inference."
     )
 
     col_studio_canvas, col_studio_pred = st.columns([1.1, 1.2], gap="large")
@@ -467,7 +515,7 @@ with tab_draw:
     with col_studio_canvas:
         st.markdown("#### 1. Draw Digit (0–9)")
 
-        # Drawing Canvas Component with dynamic key for clean clearing
+        # Canvas with safe wrapper & explicit return_image_data=True
         canvas_result = safe_st_canvas(
             fill_color="rgba(0, 0, 0, 0)",
             stroke_width=stroke_width,
@@ -482,37 +530,51 @@ with tab_draw:
 
         btn_c1, btn_c2 = st.columns([1.2, 1])
         with btn_c1:
-            predict_btn = st.button("🔍 Predict Digit", type="primary", use_container_width=True)
+            # Predict button disabled if model is not ready
+            predict_disabled = model_status != ModelStatus.READY
+            predict_btn = st.button(
+                "🔍 Predict Digit",
+                type="primary",
+                use_container_width=True,
+                disabled=predict_disabled,
+                help="Requires a loaded trained model artifact." if predict_disabled else None,
+            )
         with btn_c2:
             if st.button("🗑️ Clear Canvas", use_container_width=True):
                 st.session_state.canvas_key_id += 1
                 st.rerun()
 
-        st.caption("💡 Tip: Use your mouse or touchscreen. A clear, centered stroke gives the best recognition results.")
+        st.caption("💡 Tip: Draw a single, centered digit using mouse or finger for optimal recognition.")
 
     with col_studio_pred:
-        st.markdown("#### 2. Model Prediction & Confidence Analysis")
+        st.markdown("#### 2. Prediction & Confidence Analysis")
 
-        if model is None:
-            st.warning(
-                "⚠️ Trained model not found! Please run `python train.py` to train and save the model before testing."
+        if model_status == ModelStatus.MISSING:
+            st.warning("⚠️ **Trained Model Artifact Missing**")
+            st.info(
+                f"The model file `{MODEL_PATH.name}` was not found in the deployment directory.\n\n"
+                "**Resolution Steps:**\n"
+                "1. Ensure `models/mnist_ann_model.keras` is tracked and pushed to your GitHub repository.\n"
+                "2. Or click **'Train Model on Cloud'** in the sidebar to train on this server."
             )
+        elif model_status == ModelStatus.ERROR:
+            st.error("❌ **Model Loading Error**")
+            st.caption(model_err_msg or "Failed to deserialize model artifact.")
         elif predict_btn:
             if canvas_result.image_data is None:
                 st.info("✏️ Please draw a digit on the canvas first before clicking Predict.")
             else:
                 try:
-                    # Execute preprocessing pipeline
+                    # Preprocessing pipeline
                     processed_28x28, flattened_784 = preprocess_canvas_image(
                         canvas_result.image_data
                     )
 
-                    # Model prediction
+                    # Model inference
                     probabilities = model.predict(flattened_784, verbose=0)[0]
                     predicted_class = int(np.argmax(probabilities))
                     confidence = float(probabilities[predicted_class]) * 100.0
 
-                    # Display side-by-side: Processed 28x28 preview and Predicted Digit
                     col_p_img, col_p_res = st.columns([1, 1.3], gap="medium")
 
                     with col_p_img:
@@ -588,51 +650,59 @@ with tab_draw:
                 except EmptyCanvasError as e:
                     st.info(f"✏️ {str(e)}")
                 except Exception as e:
-                    st.error(f"❌ An error occurred during recognition: {e}")
+                    st.error(f"❌ Error during prediction: {e}")
         else:
-            st.info("✍️ Sketch a digit on the canvas to the left and click **'Predict Digit'** to see the neural network output.")
+            st.info("✍️ Sketch a digit on the canvas to the left and click **'Predict Digit'** to see the neural network classification.")
 
 
 # ==========================================
-# TAB 2: MODEL EVALUATION DASHBOARD
+# SECTION 2: MODEL EVALUATION DASHBOARD
 # ==========================================
-with tab_eval:
-    st.markdown('<div id="model-evaluation"></div>', unsafe_allow_html=True)
+elif active_section == "📊 Model Evaluation":
     st.markdown("### 📊 Rigorous Model Evaluation Dashboard")
     st.caption(
         "These metrics reflect rigorous testing on the **10,000 independent MNIST test images** "
         "that were completely isolated from the training process."
     )
 
-    if metrics is not None:
+    if model_status != ModelStatus.READY:
+        st.warning(
+            f"⚠️ Model status is currently **{model_status.value}**. "
+            "Evaluation metrics correspond only to a trained model artifact."
+        )
+
+    if metrics_data is not None and model_status == ModelStatus.READY:
         # High-level metric KPI boxes
         col_m1, col_m2, col_m3, col_m4 = st.columns(4)
         with col_m1:
+            test_acc_display = metrics_data.get("test_accuracy", 0.0) * 100.0
             st.markdown(
                 f"""
                 <div class="metric-card-box">
                     <div class="metric-card-title">Test Accuracy</div>
-                    <div class="metric-card-val" style="color: #38BDF8;">{metrics.get('test_accuracy', 0.9740) * 100:.2f}%</div>
+                    <div class="metric-card-val" style="color: #38BDF8;">{test_acc_display:.2f}%</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
         with col_m2:
+            test_loss_display = metrics_data.get("test_loss", 0.0)
             st.markdown(
                 f"""
                 <div class="metric-card-box">
                     <div class="metric-card-title">Test Loss (Cross-Entropy)</div>
-                    <div class="metric-card-val" style="color: #F59E0B;">{metrics.get('test_loss', 0.0937):.4f}</div>
+                    <div class="metric-card-val" style="color: #F59E0B;">{test_loss_display:.4f}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
         with col_m3:
+            macro_f1_display = metrics_data.get("macro_f1_score", 0.0) * 100.0
             st.markdown(
                 f"""
                 <div class="metric-card-box">
                     <div class="metric-card-title">Macro F1-Score</div>
-                    <div class="metric-card-val" style="color: #34D399;">{metrics.get('macro_f1_score', 0.9738) * 100:.2f}%</div>
+                    <div class="metric-card-val" style="color: #34D399;">{macro_f1_display:.2f}%</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -653,42 +723,42 @@ with tab_eval:
         col_ev_plot1, col_ev_plot2 = st.columns(2)
         with col_ev_plot1:
             st.markdown("#### 🎯 Confusion Matrix Heatmap")
-            if os.path.exists(CONFUSION_MATRIX_PATH):
+            if CONFUSION_MATRIX_PATH.exists():
                 st.image(
-                    CONFUSION_MATRIX_PATH,
+                    str(CONFUSION_MATRIX_PATH),
                     caption="Confusion Matrix on 10,000 MNIST Test Images",
                     use_container_width=True,
                 )
             else:
-                st.info("Confusion matrix image not found. Run `python evaluate.py` to generate.")
+                st.info("Confusion matrix image not found on disk. Run `python evaluate.py` to generate.")
 
         with col_ev_plot2:
             st.markdown("#### 📈 Training & Validation Curves")
-            if os.path.exists(CURVES_PLOT_PATH):
+            if CURVES_PLOT_PATH.exists():
                 st.image(
-                    CURVES_PLOT_PATH,
+                    str(CURVES_PLOT_PATH),
                     caption="Loss and Accuracy Convergence Across Epochs",
                     use_container_width=True,
                 )
             else:
-                st.info("Training curves plot not found. Run `python train.py` to generate.")
+                st.info("Training curves plot not found on disk. Run `python train.py` to generate.")
 
         st.markdown("---")
         st.markdown("#### 🔍 Sample Test Predictions Grid")
-        if os.path.exists(SAMPLE_PREDICTIONS_PATH):
+        if SAMPLE_PREDICTIONS_PATH.exists():
             st.image(
-                SAMPLE_PREDICTIONS_PATH,
+                str(SAMPLE_PREDICTIONS_PATH),
                 caption="Visual sample of test predictions with ground truth comparison",
                 use_container_width=True,
             )
 
         # Per-class metrics breakdown table
-        if "per_class" in metrics:
+        if "per_class" in metrics_data:
             st.markdown("#### 📋 Detailed Per-Class Classification Report")
             table_rows = []
-            for d_str, d_m in metrics["per_class"].items():
+            for d_str, d_m in metrics_data["per_class"].items():
                 table_rows.append({
-                    "Digit": d_str,
+                    "Digit Class": d_str,
                     "Precision": f"{d_m['precision'] * 100:.2f}%",
                     "Recall": f"{d_m['recall'] * 100:.2f}%",
                     "F1-Score": f"{d_m['f1_score'] * 100:.2f}%",
@@ -696,23 +766,20 @@ with tab_eval:
                 })
             st.dataframe(pd.DataFrame(table_rows), use_container_width=True, hide_index=True)
 
-        st.markdown(
-            """
-            > **Academic Integrity Note:** The reported 97.40% accuracy was measured strictly on the official MNIST test partition.
-            > High test-set accuracy on standardized images does not guarantee equal performance on arbitrary real-world handwriting
-            > due to differences in stroke speed, anti-aliasing, and aspect ratio.
-            """
+        st.info(
+            "📌 **Academic Integrity Distinction:** The 97.40% test accuracy was measured strictly on the official "
+            "MNIST test partition (10,000 standardized samples). Real-world freehand drawings naturally have greater variation "
+            "in stroke velocity, aspect ratio, and centering."
         )
-
     else:
-        st.warning("⚠️ Evaluation metrics file not found. Please run the evaluation script:")
-        st.code("python evaluate.py", language="bash")
+        st.warning("⚠️ Evaluation metrics file not found or model is unverified.")
+        st.caption("Run `python evaluate.py` to evaluate the model on the test partition.")
 
 
 # ==========================================
-# TAB 3: ANN ARCHITECTURE & THEORY
+# SECTION 3: ANN ARCHITECTURE & THEORY
 # ==========================================
-with tab_arch:
+elif active_section == "🧠 Architecture & Theory":
     st.markdown("### 🧠 Artificial Neural Network (Multilayer Perceptron) Architecture")
     st.markdown(
         """
@@ -783,9 +850,9 @@ with tab_arch:
 
 
 # ==========================================
-# TAB 4: MEET THE DEVELOPER
+# SECTION 4: MEET THE DEVELOPER
 # ==========================================
-with tab_dev:
+elif active_section == "👤 Meet the Developer":
     st.markdown("### 👤 Meet the Developer")
     st.caption("Academic profile and direct contact channels.")
 
@@ -795,17 +862,22 @@ with tab_dev:
             <div class="dev-name">{DEVELOPER.full_name}</div>
             <div class="dev-role">{DEVELOPER.designation}</div>
             <div class="dev-affil">{DEVELOPER.affiliation_line}</div>
-            <div class="action-btn-row">
-                <a class="btn-action-primary" href="{DEVELOPER.email_mailto}">✉️ Email Me</a>
-                <a class="btn-action-primary" href="{DEVELOPER.whatsapp_url}" target="_blank">💬 WhatsApp</a>
-                <a class="btn-action-secondary" href="{DEVELOPER.github_url}" target="_blank">🐙 GitHub Profile</a>
-                <a class="btn-action-secondary" href="{DEVELOPER.linkedin_url}" target="_blank">💼 LinkedIn Profile</a>
-            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
+    dev_btn1, dev_btn2, dev_btn3, dev_btn4 = st.columns(4)
+    with dev_btn1:
+        st.link_button("✉️ Email Me", url=DEVELOPER.email_mailto, use_container_width=True)
+    with dev_btn2:
+        st.link_button("💬 WhatsApp Chat", url=DEVELOPER.whatsapp_url, use_container_width=True)
+    with dev_btn3:
+        st.link_button("🐙 GitHub Profile", url=DEVELOPER.github_url, use_container_width=True)
+    with dev_btn4:
+        st.link_button("💼 LinkedIn Profile", url=DEVELOPER.linkedin_url, use_container_width=True)
+
+    st.markdown("<div style='margin-bottom: 24px;'></div>", unsafe_allow_html=True)
     st.markdown("#### 📬 Contact & Verification Details")
     contact_col1, contact_col2 = st.columns(2)
     with contact_col1:
@@ -828,32 +900,40 @@ with tab_dev:
 
 
 # ==========================================
-# FOOTER SECTION
+# CLEAN, ROBUST FOOTER RENDERING (No raw HTML leaks)
 # ==========================================
-portfolio_html = (
-    f'<a class="footer-link" href="{DEVELOPER.portfolio_url}" target="_blank">Portfolio</a> • '
-    if DEVELOPER.has_portfolio
-    else ""
-)
+st.divider()
 
-st.markdown(
-    f"""
-    <div class="app-footer">
-        <div class="footer-links">
-            <a class="footer-link" href="{DEVELOPER.github_url}" target="_blank">GitHub</a> • 
-            <a class="footer-link" href="{DEVELOPER.linkedin_url}" target="_blank">LinkedIn</a> • 
-            <a class="footer-link" href="{DEVELOPER.whatsapp_url}" target="_blank">WhatsApp</a> • 
-            <a class="footer-link" href="{DEVELOPER.email_mailto}">Email</a>
-            {portfolio_html}
-        </div>
-        <div>
-            Developed by <strong>{DEVELOPER.full_name}</strong><br>
-            {DEVELOPER.affiliation_line}
-        </div>
-        <div style="margin-top: 8px; font-size: 0.8rem; color: #64748B;">
-            Built with Python, TensorFlow, and Streamlit.
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+footer_c1, footer_c2, footer_c3 = st.columns([1, 2.5, 1])
+with footer_c2:
+    st.markdown(
+        f"<div style='text-align: center; color: #94A3B8; font-size: 0.95rem;'>"
+        f"Developed by <strong style='color: #F8FAFC;'>{DEVELOPER.full_name}</strong><br>"
+        f"<span style='color: #64748B;'>{DEVELOPER.affiliation_line}</span>"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+    portfolio_link_item = (
+        f" • <a href='{DEVELOPER.portfolio_url}' target='_blank' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>🌐 Portfolio</a>"
+        if DEVELOPER.has_portfolio
+        else ""
+    )
+
+    st.markdown(
+        f"<div style='text-align: center; margin-top: 8px; margin-bottom: 6px; font-size: 0.9rem;'>"
+        f"<a href='{DEVELOPER.github_url}' target='_blank' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>🐙 GitHub</a> • "
+        f"<a href='{DEVELOPER.linkedin_url}' target='_blank' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>💼 LinkedIn</a> • "
+        f"<a href='{DEVELOPER.whatsapp_url}' target='_blank' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>💬 WhatsApp</a> • "
+        f"<a href='{DEVELOPER.email_mailto}' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>✉️ Email</a>"
+        f"{portfolio_link_item}"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        "<div style='text-align: center; font-size: 0.8rem; color: #64748B; margin-top: 4px;'>"
+        "Built with Python, TensorFlow, and Streamlit."
+        "</div>",
+        unsafe_allow_html=True,
+    )

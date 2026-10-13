@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Handwritten Digit Recognition Using Artificial Neural Network (ANN)
 
 An educational, beginner-friendly, and complete implementation of an Artificial Neural Network (Multilayer Perceptron) for handwritten digit recognition (0–9) using Python, TensorFlow/Keras, and Streamlit.
@@ -428,7 +429,7 @@ This project is structured for 1-click cloud deployment on **Streamlit Community
 3. Set the default branch and connect your remote repository:
    ```bash
    git branch -M main
-   git remote add origin https://github.com/TuhassinulArnob/HandWritingANN.git
+   git remote add origin https://github.com/TuhassinulArnob/HandWriting_Detection_simpleANN.git
    ```
 4. Push your codebase:
    ```bash
@@ -440,7 +441,7 @@ This project is structured for 1-click cloud deployment on **Streamlit Community
 1. Go to [share.streamlit.io](https://share.streamlit.io/) and log in with your GitHub account.
 2. Click **"New app"**.
 3. Fill in the repository configuration:
-   - **Repository:** `TuhassinulArnob/HandWritingANN`
+   - **Repository:** `TuhassinulArnob/HandWriting_Detection_simpleANN`
    - **Branch:** `main`
    - **Main file path:** `app.py`
 4. Under **Advanced settings**, set:

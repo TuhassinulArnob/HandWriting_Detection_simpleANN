@@ -18,9 +18,9 @@ Usage:
 """
 
 import os
-import sys
 import json
 import argparse
+from pathlib import Path
 from typing import Tuple, Dict, Any
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,13 +30,13 @@ import tensorflow as tf
 from model import build_ann_model
 
 
-# Standard paths
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODELS_DIR = os.path.join(BASE_DIR, "models")
-OUTPUTS_DIR = os.path.join(BASE_DIR, "outputs")
-MODEL_PATH = os.path.join(MODELS_DIR, "mnist_ann_model.keras")
-HISTORY_PATH = os.path.join(OUTPUTS_DIR, "training_history.json")
-CURVES_PLOT_PATH = os.path.join(OUTPUTS_DIR, "training_curves.png")
+# Standard pathlib paths
+BASE_DIR = Path(__file__).resolve().parent
+MODELS_DIR = BASE_DIR / "models"
+OUTPUTS_DIR = BASE_DIR / "outputs"
+MODEL_PATH = MODELS_DIR / "mnist_ann_model.keras"
+HISTORY_PATH = OUTPUTS_DIR / "training_history.json"
+CURVES_PLOT_PATH = OUTPUTS_DIR / "training_curves.png"
 
 
 def set_seed(seed: int = 42) -> None:

@@ -51,6 +51,7 @@ class AppConfig:
         "classification (0–9) using a traditional Multilayer Perceptron (MLP) trained on the MNIST dataset."
     )
     version: str = "2.0.0"
+    repo_url: str = "https://github.com/TuhassinulArnob/HandWriting_Detection_simpleANN"
 
 
 # Singleton instances for global import

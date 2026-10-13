@@ -16,22 +16,22 @@ Usage:
 """
 
 import os
-import sys
 import json
+from pathlib import Path
 from typing import Dict, Any, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support
 
-# Standard paths
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODELS_DIR = os.path.join(BASE_DIR, "models")
-OUTPUTS_DIR = os.path.join(BASE_DIR, "outputs")
-MODEL_PATH = os.path.join(MODELS_DIR, "mnist_ann_model.keras")
-METRICS_PATH = os.path.join(OUTPUTS_DIR, "evaluation_metrics.json")
-CONFUSION_MATRIX_PATH = os.path.join(OUTPUTS_DIR, "confusion_matrix.png")
-SAMPLE_PREDICTIONS_PATH = os.path.join(OUTPUTS_DIR, "sample_predictions.png")
+# Standard pathlib paths
+BASE_DIR = Path(__file__).resolve().parent
+MODELS_DIR = BASE_DIR / "models"
+OUTPUTS_DIR = BASE_DIR / "outputs"
+MODEL_PATH = MODELS_DIR / "mnist_ann_model.keras"
+METRICS_PATH = OUTPUTS_DIR / "evaluation_metrics.json"
+CONFUSION_MATRIX_PATH = OUTPUTS_DIR / "confusion_matrix.png"
+SAMPLE_PREDICTIONS_PATH = OUTPUTS_DIR / "sample_predictions.png"
 
 
 def load_model_safely(model_path: str = MODEL_PATH) -> tf.keras.Model:
@@ -44,14 +44,15 @@ def load_model_safely(model_path: str = MODEL_PATH) -> tf.keras.Model:
     Returns:
         Loaded tf.keras.Model instance.
     """
-    if not os.path.exists(model_path):
+    target = Path(model_path)
+    if not target.exists():
         raise FileNotFoundError(
-            f"Trained model not found at '{model_path}'.\n"
+            f"Trained model not found at '{target}'.\n"
             f"Please run the training script first:\n"
             f"    python train.py"
         )
     try:
-        model = tf.keras.models.load_model(model_path)
+        model = tf.keras.models.load_model(str(target))
         return model
     except Exception as e:
         raise RuntimeError(
