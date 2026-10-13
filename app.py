@@ -161,10 +161,50 @@ def safe_st_canvas(*args, return_image_data: bool = True, **kwargs):
 
 
 # ==========================================
-# DARK THEME CSS STYLING
+# BRAND & CONTACT ICONS (Vector SVGs)
+# ==========================================
+ICON_GITHUB = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;">'
+    '<path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 '
+    '0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 '
+    '1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 '
+    '0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 '
+    '1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 '
+    '0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>'
+    '</svg>'
+)
+
+ICON_LINKEDIN = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;">'
+    '<path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>'
+    '</svg>'
+)
+
+ICON_WHATSAPP = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;">'
+    '<path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.66.31-.23.25-.88.86-.88 2.09 0 1.24.9 2.44 1.03 2.61.12.17 1.77 2.7 4.28 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.59.21-1.09.15-1.19-.07-.1-.23-.17-.48-.29z"/>'
+    '</svg>'
+)
+
+ICON_EMAIL = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;">'
+    '<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>'
+    '</svg>'
+)
+
+ICON_GLOBE = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;">'
+    '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>'
+    '</svg>'
+)
+
+
+# ==========================================
+# DARK THEME CSS STYLING & ICON CDN
 # ==========================================
 st.markdown(
     """
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
@@ -309,6 +349,252 @@ st.markdown(
         color: #94A3B8;
         margin-bottom: 18px;
     }
+
+    /* Brand Button Grid (Section 4) */
+    .brand-btn-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin-top: 14px;
+        margin-bottom: 24px;
+    }
+    .brand-btn {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        border-radius: 12px;
+        text-decoration: none !important;
+        font-weight: 600;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    .brand-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+        text-decoration: none !important;
+    }
+    .brand-btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        flex-shrink: 0;
+    }
+    .brand-btn-content {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .brand-btn-title {
+        font-weight: 700;
+        font-size: 1rem;
+        line-height: 1.2;
+    }
+    .brand-btn-subtitle {
+        font-size: 0.8rem;
+        color: #94A3B8;
+        margin-top: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .brand-btn-github {
+        background: linear-gradient(135deg, rgba(36, 41, 47, 0.95) 0%, rgba(22, 27, 34, 0.95) 100%);
+        border-color: rgba(240, 246, 252, 0.18);
+        color: #F0F6FC !important;
+    }
+    .brand-btn-github .brand-btn-icon {
+        background: rgba(255, 255, 255, 0.12);
+        color: #FFFFFF;
+    }
+    .brand-btn-github:hover {
+        border-color: #58A6FF;
+        color: #FFFFFF !important;
+        box-shadow: 0 8px 24px rgba(88, 166, 255, 0.25);
+    }
+
+    .brand-btn-linkedin {
+        background: linear-gradient(135deg, rgba(10, 102, 194, 0.22) 0%, rgba(10, 102, 194, 0.08) 100%);
+        border-color: rgba(10, 102, 194, 0.45);
+        color: #F0F6FC !important;
+    }
+    .brand-btn-linkedin .brand-btn-icon {
+        background: #0A66C2;
+        color: #FFFFFF;
+    }
+    .brand-btn-linkedin:hover {
+        border-color: #0A66C2;
+        background: linear-gradient(135deg, rgba(10, 102, 194, 0.38) 0%, rgba(10, 102, 194, 0.16) 100%);
+        color: #FFFFFF !important;
+        box-shadow: 0 8px 24px rgba(10, 102, 194, 0.35);
+    }
+
+    .brand-btn-whatsapp {
+        background: linear-gradient(135deg, rgba(37, 211, 102, 0.22) 0%, rgba(37, 211, 102, 0.08) 100%);
+        border-color: rgba(37, 211, 102, 0.45);
+        color: #F0F6FC !important;
+    }
+    .brand-btn-whatsapp .brand-btn-icon {
+        background: #25D366;
+        color: #FFFFFF;
+    }
+    .brand-btn-whatsapp:hover {
+        border-color: #25D366;
+        background: linear-gradient(135deg, rgba(37, 211, 102, 0.38) 0%, rgba(37, 211, 102, 0.16) 100%);
+        color: #FFFFFF !important;
+        box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+    }
+
+    .brand-btn-email {
+        background: linear-gradient(135deg, rgba(234, 67, 53, 0.22) 0%, rgba(234, 67, 53, 0.08) 100%);
+        border-color: rgba(234, 67, 53, 0.45);
+        color: #F0F6FC !important;
+    }
+    .brand-btn-email .brand-btn-icon {
+        background: #EA4335;
+        color: #FFFFFF;
+    }
+    .brand-btn-email:hover {
+        border-color: #EA4335;
+        background: linear-gradient(135deg, rgba(234, 67, 53, 0.38) 0%, rgba(234, 67, 53, 0.16) 100%);
+        color: #FFFFFF !important;
+        box-shadow: 0 8px 24px rgba(234, 67, 53, 0.35);
+    }
+
+    /* Sidebar Contact Chips */
+    .sidebar-chip-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+        margin-bottom: 12px;
+    }
+    .sidebar-chip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 8px;
+        text-decoration: none !important;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .sidebar-chip:hover {
+        transform: translateX(4px);
+        text-decoration: none !important;
+    }
+    .sidebar-chip-github {
+        background: rgba(36, 41, 47, 0.7);
+        color: #F0F6FC !important;
+        border-color: rgba(240, 246, 252, 0.15);
+    }
+    .sidebar-chip-github:hover {
+        background: rgba(56, 189, 248, 0.15);
+        border-color: #38BDF8;
+        color: #FFFFFF !important;
+    }
+    .sidebar-chip-linkedin {
+        background: rgba(10, 102, 194, 0.15);
+        color: #93C5FD !important;
+        border-color: rgba(10, 102, 194, 0.35);
+    }
+    .sidebar-chip-linkedin:hover {
+        background: rgba(10, 102, 194, 0.3);
+        border-color: #60A5FA;
+        color: #FFFFFF !important;
+    }
+    .sidebar-chip-whatsapp {
+        background: rgba(37, 211, 102, 0.15);
+        color: #86EFAC !important;
+        border-color: rgba(37, 211, 102, 0.35);
+    }
+    .sidebar-chip-whatsapp:hover {
+        background: rgba(37, 211, 102, 0.3);
+        border-color: #4ADE80;
+        color: #FFFFFF !important;
+    }
+    .sidebar-chip-email {
+        background: rgba(234, 67, 53, 0.15);
+        color: #FCA5A5 !important;
+        border-color: rgba(234, 67, 53, 0.35);
+    }
+    .sidebar-chip-email:hover {
+        background: rgba(234, 67, 53, 0.3);
+        border-color: #F87171;
+        color: #FFFFFF !important;
+    }
+
+    /* Contact Details Card */
+    .contact-detail-card {
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 12px;
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .contact-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.92rem;
+    }
+    .contact-detail-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+    .contact-detail-link {
+        color: #38BDF8 !important;
+        text-decoration: none !important;
+        font-weight: 500;
+    }
+    .contact-detail-link:hover {
+        text-decoration: underline !important;
+    }
+
+    /* Footer Chips */
+    .footer-chips-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+        margin-bottom: 8px;
+    }
+    .footer-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(15, 23, 42, 0.85);
+        color: #CBD5E1 !important;
+    }
+    .footer-chip:hover {
+        transform: translateY(-2px);
+        border-color: #38BDF8;
+        color: #FFFFFF !important;
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -424,12 +710,25 @@ st.sidebar.markdown(
     """
 )
 st.sidebar.markdown(
-    f"""
-    [🐙 GitHub Profile]({DEVELOPER.github_url})  
-    [💼 LinkedIn Profile]({DEVELOPER.linkedin_url})  
-    [💬 WhatsApp Chat]({DEVELOPER.whatsapp_url})  
-    [✉️ Send Email]({DEVELOPER.email_mailto})
-    """
+    f"""<div class="sidebar-chip-container">
+<a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="sidebar-chip sidebar-chip-github">
+<span style="display:flex;align-items:center;">{ICON_GITHUB}</span>
+<span>GitHub Profile</span>
+</a>
+<a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="sidebar-chip sidebar-chip-linkedin">
+<span style="display:flex;align-items:center;color:#0A66C2;">{ICON_LINKEDIN}</span>
+<span>LinkedIn Profile</span>
+</a>
+<a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="sidebar-chip sidebar-chip-whatsapp">
+<span style="display:flex;align-items:center;color:#25D366;">{ICON_WHATSAPP}</span>
+<span>WhatsApp Chat</span>
+</a>
+<a href="{DEVELOPER.email_mailto}" class="sidebar-chip sidebar-chip-email">
+<span style="display:flex;align-items:center;color:#EA4335;">{ICON_EMAIL}</span>
+<span>Send Email</span>
+</a>
+</div>""",
+    unsafe_allow_html=True,
 )
 
 
@@ -872,25 +1171,70 @@ elif active_section == "👤 Meet the Developer":
         unsafe_allow_html=True,
     )
 
-    dev_btn1, dev_btn2, dev_btn3, dev_btn4 = st.columns(4)
-    with dev_btn1:
-        st.link_button("✉️ Email Me", url=DEVELOPER.email_mailto, use_container_width=True)
-    with dev_btn2:
-        st.link_button("💬 WhatsApp Chat", url=DEVELOPER.whatsapp_url, use_container_width=True)
-    with dev_btn3:
-        st.link_button("🐙 GitHub Profile", url=DEVELOPER.github_url, use_container_width=True)
-    with dev_btn4:
-        st.link_button("💼 LinkedIn Profile", url=DEVELOPER.linkedin_url, use_container_width=True)
+    st.markdown(
+        f"""<div class="brand-btn-grid">
+<a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="brand-btn brand-btn-github">
+<span class="brand-btn-icon">{ICON_GITHUB}</span>
+<div class="brand-btn-content">
+<span class="brand-btn-title">GitHub</span>
+<span class="brand-btn-subtitle">@TuhassinulArnob</span>
+</div>
+</a>
+<a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="brand-btn brand-btn-linkedin">
+<span class="brand-btn-icon">{ICON_LINKEDIN}</span>
+<div class="brand-btn-content">
+<span class="brand-btn-title">LinkedIn</span>
+<span class="brand-btn-subtitle">in/tuhassinularnob</span>
+</div>
+</a>
+<a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="brand-btn brand-btn-whatsapp">
+<span class="brand-btn-icon">{ICON_WHATSAPP}</span>
+<div class="brand-btn-content">
+<span class="brand-btn-title">WhatsApp</span>
+<span class="brand-btn-subtitle">{DEVELOPER.phone}</span>
+</div>
+</a>
+<a href="{DEVELOPER.email_mailto}" class="brand-btn brand-btn-email">
+<span class="brand-btn-icon">{ICON_EMAIL}</span>
+<div class="brand-btn-content">
+<span class="brand-btn-title">Email</span>
+<span class="brand-btn-subtitle">{DEVELOPER.email}</span>
+</div>
+</a>
+</div>""",
+        unsafe_allow_html=True,
+    )
 
-    st.markdown("<div style='margin-bottom: 24px;'></div>", unsafe_allow_html=True)
-    st.markdown("#### 📬 Contact & Verification Details")
+    st.markdown("#### 📬 Direct Channels & Verification")
     contact_col1, contact_col2 = st.columns(2)
     with contact_col1:
-        st.markdown(f"**Email:** [{DEVELOPER.email}]({DEVELOPER.email_mailto})")
-        st.markdown(f"**WhatsApp / Phone:** [{DEVELOPER.phone}]({DEVELOPER.whatsapp_url})")
+        st.markdown(
+            f"""<div class="contact-detail-card">
+<div class="contact-detail-item">
+<span class="contact-detail-icon" style="background: rgba(234, 67, 53, 0.15); color: #EA4335;">{ICON_EMAIL}</span>
+<div><strong>Email:</strong> <a href="{DEVELOPER.email_mailto}" class="contact-detail-link">{DEVELOPER.email}</a></div>
+</div>
+<div class="contact-detail-item">
+<span class="contact-detail-icon" style="background: rgba(37, 211, 102, 0.15); color: #25D366;">{ICON_WHATSAPP}</span>
+<div><strong>WhatsApp / Phone:</strong> <a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="contact-detail-link">{DEVELOPER.phone}</a></div>
+</div>
+</div>""",
+            unsafe_allow_html=True,
+        )
     with contact_col2:
-        st.markdown(f"**GitHub:** [{DEVELOPER.github_url}]({DEVELOPER.github_url})")
-        st.markdown(f"**LinkedIn:** [{DEVELOPER.linkedin_url}]({DEVELOPER.linkedin_url})")
+        st.markdown(
+            f"""<div class="contact-detail-card">
+<div class="contact-detail-item">
+<span class="contact-detail-icon" style="background: rgba(255, 255, 255, 0.1); color: #F0F6FC;">{ICON_GITHUB}</span>
+<div><strong>GitHub:</strong> <a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="contact-detail-link">github.com/TuhassinulArnob</a></div>
+</div>
+<div class="contact-detail-item">
+<span class="contact-detail-icon" style="background: rgba(10, 102, 194, 0.15); color: #0A66C2;">{ICON_LINKEDIN}</span>
+<div><strong>LinkedIn:</strong> <a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="contact-detail-link">linkedin.com/in/tuhassinularnob</a></div>
+</div>
+</div>""",
+            unsafe_allow_html=True,
+        )
 
     st.markdown("---")
     st.markdown(
@@ -919,20 +1263,29 @@ with footer_c2:
         unsafe_allow_html=True,
     )
 
-    portfolio_link_item = (
-        f" • <a href='{DEVELOPER.portfolio_url}' target='_blank' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>🌐 Portfolio</a>"
+    portfolio_chip_html = (
+        f"<a href='{DEVELOPER.portfolio_url}' target='_blank' rel='noopener noreferrer' class='footer-chip'>"
+        f"<span style='color: #38BDF8;'>{ICON_GLOBE}</span> Portfolio</a>"
         if DEVELOPER.has_portfolio
         else ""
     )
 
     st.markdown(
-        f"<div style='text-align: center; margin-top: 8px; margin-bottom: 6px; font-size: 0.9rem;'>"
-        f"<a href='{DEVELOPER.github_url}' target='_blank' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>🐙 GitHub</a> • "
-        f"<a href='{DEVELOPER.linkedin_url}' target='_blank' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>💼 LinkedIn</a> • "
-        f"<a href='{DEVELOPER.whatsapp_url}' target='_blank' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>💬 WhatsApp</a> • "
-        f"<a href='{DEVELOPER.email_mailto}' style='color: #38BDF8; margin: 0 8px; text-decoration: none;'>✉️ Email</a>"
-        f"{portfolio_link_item}"
-        f"</div>",
+        f"""<div class="footer-chips-row">
+<a href="{DEVELOPER.github_url}" target="_blank" rel="noopener noreferrer" class="footer-chip">
+<span style="color: #F0F6FC;">{ICON_GITHUB}</span> GitHub
+</a>
+<a href="{DEVELOPER.linkedin_url}" target="_blank" rel="noopener noreferrer" class="footer-chip">
+<span style="color: #0A66C2;">{ICON_LINKEDIN}</span> LinkedIn
+</a>
+<a href="{DEVELOPER.whatsapp_url}" target="_blank" rel="noopener noreferrer" class="footer-chip">
+<span style="color: #25D366;">{ICON_WHATSAPP}</span> WhatsApp
+</a>
+<a href="{DEVELOPER.email_mailto}" class="footer-chip">
+<span style="color: #EA4335;">{ICON_EMAIL}</span> Email
+</a>
+{portfolio_chip_html}
+</div>""",
         unsafe_allow_html=True,
     )
 
